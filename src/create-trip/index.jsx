@@ -1,10 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { Input } from "@/components/ui/input"
-import { SelectBudgetOptions, SelectTravelesList } from '../constants/options'
+import { AI_PROMPT, SelectBudgetOptions, SelectTravelesList } from '../constants/options'
 import { Button } from "@/components/ui/button"
+import { toast } from 'sonner'
+import { chatSession } from '../service/AIModal'
+import { doc, setDoc } from 'firebase/firestore'
+import { db } from '../service/firebaseConfig'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from '@react-oauth/google'
+import axios from 'axios'
+
 
 function CreateTrip() {
 
+  const [openDialog, setOpenDialog] = useState(false)
   const [place, setPlace] = useState()
   const [formData, setFormData] =useState([])
   const handleInputChange = (name,value) => {
@@ -17,6 +34,61 @@ function CreateTrip() {
   useEffect(()=>{
     console.log(formData)
   },[formData])
+
+  const login = useGoogleLogin({
+    onSuccess: (codeResp) => console.log(codeResp),
+    onError: (error) => console.log(error)
+  })
+
+  const onGenerateTrip = async() => {
+
+      const user = localStorage.getItem('user')
+
+      if(!user){
+        setOpenDialog(true)
+        return;
+      }
+
+      if(formData?.noOfDays>5 && !formData?.location || !formData?.budget || !formData?.noOfPeoples){
+        toast("Please fill all the details")
+        return ;
+      }
+
+      const FINAL_PROMPT = AI_PROMPT
+      .replace('{location}',formData?.location)
+      .replace('{noOfDays}',formData?.noOfDays)
+      .replace('{noOfPeoples}',formData?.noOfPeoples)
+      .replace('{budget}',formData?.budget)
+      .replace('{noOfDays}',formData?.noOfDays)
+
+      console.log(FINAL_PROMPT)
+
+      const result = await chatSession.sendMessage(FINAL_PROMPT)
+  }
+
+  const getUserProfile = (tokenInfo) => {
+        axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?acess_token=${tokenInfo?.access_token}`, {
+          headers:{
+            Authorization: `Bearer ${tokenInfo?.access_token}`,
+            Accept: 'Application/json'
+          }
+        }).then((resp) => {
+          console.log(resp)
+          localStorage.setItem('user', JSON.stringify(resp.data))
+          setOpenDialog(false)
+          onGenerateTrip()
+        })
+  }
+
+  const SaveAiTrip = async(TripData) => {
+        // Add a new document in collection "cities"
+        await setDoc(doc(db, "cities", "LA"), {
+        name: "Los Angeles",
+        state: "CA",
+        country: "USA"
+});
+
+  }
 
   return (
     <div className='mt-10 px-72'>
@@ -71,8 +143,24 @@ function CreateTrip() {
         </div>
 
         <div className='my-10 flex justify-end'>
-          <Button>Generate Trip with AI</Button>
+          <Button onClick={onGenerateTrip}>Generate Trip with AI</Button>
         </div>
+
+        <Dialog open={openDialog}>
+        <DialogContent>
+          <DialogHeader>
+            
+            <DialogDescription>
+              <img src='src/assets/logo.svg' />
+              <h2 className='font-bold text-lg mt-5 items-center'>Sign In with Google</h2>
+              <p>Sign in to the app with Google authentication securely</p>
+              
+              <Button onClick={login} className=' w-full mt-5 gap-3 items-center'><FcGoogle className='w-7 h-7'/>Sign in with Google</Button>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+        </Dialog>
+
 
       </div>
 
