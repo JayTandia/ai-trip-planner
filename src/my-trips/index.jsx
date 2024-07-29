@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from '../service/firebaseConfig';
+import UserTripCardItem from './components/UserTripCardItem';
 
 function MyTrips() {
 
@@ -23,7 +24,19 @@ function MyTrips() {
     }
 
   return (
-    <div>MyTrips</div>
+    <div className='px-5 md:px-32 lg:px-56 mt-10'>
+      <h2 className='font-bold text-3xl'>My Trips</h2>
+
+      <div className='grid grid-cols-3 gap-5 mt-10'>
+        {userTrip?.length>0?userTrip.map((trip,index)=>(
+          <UserTripCardItem trip={trip} key={index}/>
+        ))
+        :[1,2,3,4,5,6].map((item,index)=>(
+          <div key={index} className='h-[250px] w-full bg-slate-200 animate-pulse rounded-xl'></div>
+        ))
+        }
+      </div>
+    </div>
   )
 }
 
