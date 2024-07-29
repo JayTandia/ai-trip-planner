@@ -14,10 +14,13 @@
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.0",
     "@react-oauth/google": "^0.12.1",
+    "@react-three/drei": "^9.109.2",
+    "@react-three/fiber": "^8.16.8",
     "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "firebase": "^10.12.4",
+    "framer-motion": "^11.3.19",
     "lucide-react": "^0.414.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
@@ -27,7 +30,9 @@
     "react-router-dom": "^6.25.1",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "three": "^0.167.0",
+    "three-globe": "^2.31.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
