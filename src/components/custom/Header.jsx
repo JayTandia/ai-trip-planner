@@ -8,7 +8,7 @@ function Header() {
 
         <a href='/'>
         <div className='flex items-center gap-4 font-bold text-xl text-[#fb4f39]'>
-          <img src='src/assets/logo.svg'/>
+          <img src='/logo.svg'/>
           <h1>AI Trip Planner</h1>
         </div>
         </a>
